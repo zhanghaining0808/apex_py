@@ -20,5 +20,5 @@ def query_weapon_by_name(weapon_tag: str, session: Session = Depends(get_session
         find_weapon = session.get(Weapon, weapon_tag)
 
     if not find_weapon:
-        return {"error": "没用该武器!"}
+        return {"error": "没有该武器!"}
     return find_weapon
