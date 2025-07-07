@@ -1,4 +1,4 @@
-from apex_py.models.weapon import Weapon
+from models.weapon import Weapon
 
 
 weapons = [
