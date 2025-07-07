@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Session, create_engine, select
-from apex_py.models.weapon import Weapon
+from models.weapon import Weapon
 from models.hero import Hero
 from data.hero import heros
 from data.weapon import weapons
