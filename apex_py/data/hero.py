@@ -1,6 +1,5 @@
 from models.hero import Hero
 
-
 heros = [
     Hero(
         id=1,
