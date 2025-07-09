@@ -1,7 +1,8 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import Depends, HTTPException
 from fastapi import APIRouter
 
+from pydantic import BaseModel
 from sqlmodel import Session, select
 from db.db import get_session
 from models.hero import Hero
@@ -30,7 +31,8 @@ def query_hero_by_name(hero_tag: str, session: SessionDep):
         find_hero = session.get(Hero, hero_tag)
 
     if not find_hero:
-        return {"error": "没有该英雄!"}
+        raise HTTPException(status_code=404, detail="英雄未找到")
+
     return find_hero
 
 
@@ -54,16 +56,39 @@ def delete_hero(hero_tag: str, session: SessionDep):
         find_hero = session.exec(select(Hero).where(Hero.name == hero_tag)).first()
 
     if not find_hero:
-        return {"error": "没有该英雄!"}
+        raise HTTPException(status_code=404, detail="英雄未找到")
 
     session.delete(find_hero)
     session.commit()
     return find_hero
 
 
-# @hero_router.post("/update/{hero_tag}")
-# def update_hero_by_name(hero_tag: Hero, session: SessionDep):
-#     pass
+class ReqUpdateHero(BaseModel):
+    update_key: List[str]
+    hero: Hero
+
+
+@hero_router.post("/update/{hero_tag}")
+def update_hero(hero_tag: str, update_hero: ReqUpdateHero, session: SessionDep):
+    find_hero = session.get(Hero, hero_tag)
+
+    if not find_hero:
+        raise HTTPException(status_code=404, detail="英雄未找到")
+
+    new_hero = find_hero
+
+    if "name" in update_hero.update_key:
+        new_hero.name = update_hero.hero.name
+
+    if "role" in update_hero.update_key:
+        new_hero.role = update_hero.hero.role
+
+    find_hero.sqlmodel_update(new_hero)
+    session.add(new_hero)
+    session.commit()
+    session.refresh(new_hero)
+
+    return new_hero
 
 
 # @hero_router.get("/by_id/{hero_id}")

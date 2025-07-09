@@ -32,9 +32,10 @@ def init_db():
         for hero in heros:
             if all_heros.count(hero) <= 0:
                 session.add(hero)
-                session.commit()
+
                 miss_heros.append(hero)
         if len(miss_heros) > 0:
+            session.commit()
             print(
                 f"数据表检测到遗漏数据，现已同步缺失{[hero.name for hero in miss_heros]}英雄"
             )
